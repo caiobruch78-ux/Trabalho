@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Quadrados — Matemática</title>
+<style>
+:root{
+  --ink:#071827; --blue0:#0D2940; --blue1:#123B59; --blue2:#1769AA;
+  --blue3:#2479B8; --paper:#F1EEE6; --white:#fffdf8; --red:#8f3437;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Inter,Manrope,Arial,sans-serif;color:var(--ink);background:var(--ink)}
+button{font:inherit}
+.start{
+  width:100%;height:100%;display:grid;place-items:center;background:var(--paper);
+  position:relative;padding:5vw;
+}
+.start:after{content:"";position:absolute;right:7vw;top:11vh;width:min(26vw,310px);height:min(26vw,310px);
+  border:5px solid var(--blue2);transform:rotate(10deg);opacity:.95}
+.start-inner{width:min(980px,92vw);position:relative;z-index:1}
+.kicker{font-size:clamp(14px,1.5vw,20px);letter-spacing:.12em;text-transform:uppercase;color:var(--blue2);font-weight:800;margin-bottom:22px}
+.start h1{font-size:clamp(68px,13vw,170px);line-height:.84;margin:0 0 30px;font-weight:900;letter-spacing:-.07em;color:var(--ink)}
+.subtitle{font-size:clamp(18px,2.2vw,30px);max-width:720px;line-height:1.35;margin-bottom:38px}
+.names{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:clamp(14px,1.4vw,19px);font-weight:700;margin-bottom:42px}
+.names span:not(:last-child):after{content:"•";margin-left:22px;color:var(--blue3)}
+.enter{border:0;background:var(--blue2);color:white;padding:17px 30px;cursor:pointer;font-weight:800;letter-spacing:.04em}
+.corner{position:fixed;right:24px;bottom:22px;border:1px solid var(--blue2);background:transparent;color:var(--blue2);padding:9px 14px;font-weight:800;cursor:pointer}
+
+.presentation{display:none;width:100%;height:100%;background:var(--paper);position:relative}
+.slide{display:none;width:100%;height:100%;padding:clamp(35px,5vw,72px) clamp(30px,7vw,110px) 70px;position:relative}
+.slide.active{display:block}
+.slide-head{display:flex;align-items:flex-start;justify-content:space-between;gap:30px;margin-bottom:20px}
+.slide h2{font-size:clamp(38px,5vw,70px);line-height:.98;margin:0;letter-spacing:-.045em;color:var(--ink)}
+.num{font-size:13px;font-weight:900;letter-spacing:.12em;color:var(--blue2);padding-top:8px;white-space:nowrap}
+.lead{font-size:clamp(17px,1.7vw,23px);line-height:1.45;max-width:720px}
+.controls{position:absolute;left:0;right:0;bottom:0;height:42px;padding:0 clamp(18px,4vw,60px);display:flex;align-items:center;gap:15px;background:var(--paper)}
+.progress{height:3px;background:#c7c8c4;flex:1}.progress i{display:block;height:100%;background:var(--blue2);width:0}
+.counter{font-size:12px;font-weight:800;color:var(--blue1);min-width:44px;text-align:right}
+.key{font-weight:800;color:var(--blue2)}
+.diagram{color:var(--blue2)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:clamp(25px,5vw,80px);align-items:center;height:calc(100% - 120px)}
+.definition .diagram-box{display:grid;place-items:center}
+.diagram-box{min-height:380px}
+.explain{font-size:clamp(17px,1.7vw,24px);line-height:1.5}
+.points{margin:22px 0 0;padding-left:24px}.points li{margin:10px 0}
+.math{font-size:clamp(25px,3vw,44px);font-weight:900;line-height:1.25}
+.math small{font-size:.5em;font-weight:700}
+.label{font-size:18px;font-weight:800;fill:var(--ink)}
+.bluefill{fill:#dbeaf4}.blueStroke{stroke:var(--blue2)}.inkStroke{stroke:var(--ink)}
+svg{max-width:100%;height:auto}
+
+.angle-layout{display:grid;grid-template-columns:1.15fr .85fr;gap:5vw;align-items:center;height:calc(100% - 125px)}
+.angle-note{border-left:5px solid var(--blue2);padding-left:25px;max-width:520px}
+.angle-note strong{display:block;font-size:clamp(35px,4vw,60px);color:var(--blue2);margin-bottom:8px}
+
+.circle-layout{height:calc(100% - 115px);display:grid;grid-template-columns:1.05fr .95fr;gap:4vw;align-items:center}
+.circle-copy{font-size:clamp(17px,1.65vw,23px);line-height:1.48}
+.callout{margin-top:22px;padding:17px 19px;border-left:5px solid var(--blue2);background:#e2edf3;font-weight:700}
+.diag-layout{display:grid;grid-template-columns:1.2fr .8fr;gap:5vw;align-items:center;height:calc(100% - 120px)}
+.diag-list{font-size:clamp(18px,1.8vw,25px);line-height:1.55}.diag-list p{margin:13px 0}
+.area-layout{height:calc(100% - 120px);display:grid;grid-template-columns:1fr 1fr;gap:5vw;align-items:center}
+.area-example{border-top:3px solid var(--blue2);padding-top:22px;margin-top:20px}
+.square-grid{stroke:#b4c6d0;stroke-width:1}.square-border{stroke:var(--blue2);stroke-width:4;fill:#e6f0f5}
+.root-layout{height:calc(100% - 120px);display:grid;grid-template-columns:1.1fr .9fr;gap:4vw;align-items:center}
+.root-examples{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0}
+.root-example{border:1px solid #aebbc1;padding:15px;text-align:center;background:#faf8f2}
+.root-example b{display:block;font-size:28px;color:var(--blue2);margin-bottom:8px}
+.between{font-size:clamp(20px,2.1vw,29px);font-weight:800;margin:24px 0}
+.root2{font-size:clamp(38px,5vw,68px);font-weight:900;color:var(--blue2)}
+.pyth-layout{height:calc(100% - 120px);display:grid;grid-template-columns:1fr 1fr;gap:5vw;align-items:center}
+.step{margin:8px 0;font-size:clamp(18px,1.7vw,24px)}
+.step b{color:var(--blue2)}
+.formula{font-size:clamp(25px,2.8vw,42px);font-weight:900;margin:18px 0;color:var(--ink)}
+.vertices-layout{height:calc(100% - 120px);display:grid;grid-template-columns:1fr .8fr;gap:5vw;align-items:center}
+.recap{border-left:4px solid var(--blue2);padding-left:25px;font-size:clamp(17px,1.6vw,22px);line-height:1.75}
+.end{display:grid;place-items:center;text-align:center;background:var(--ink);color:var(--paper)}
+.end h2{color:var(--paper);font-size:clamp(60px,10vw,130px);margin:0;letter-spacing:-.06em}
+.end .names{justify-content:center;color:#cbd5da;margin-top:24px}
+.end .square-end{width:110px;height:110px;border:5px solid var(--blue3);margin:0 auto 35px;transform:rotate(45deg)}
+.home{position:absolute;top:18px;right:22px;border:0;background:transparent;color:var(--blue1);font-size:12px;font-weight:800;cursor:pointer;z-index:5}
+@media(max-width:800px){
+ .start:after{opacity:.35}
+ .grid2,.angle-layout,.circle-layout,.diag-layout,.area-layout,.root-layout,.pyth-layout,.vertices-layout{grid-template-columns:1fr;gap:10px;height:auto;overflow:auto;padding-bottom:30px}
+ .slide{overflow:auto;padding-bottom:65px}
+ .diagram-box{min-height:260px}
+ .slide h2{font-size:38px}
+ .root-examples{grid-template-columns:1fr 1fr 1fr}
+}
+@media(max-height:650px){
+ .slide{padding-top:30px}
+ .diagram-box{min-height:280px}
+ .slide h2{font-size:42px}
+}
+</style>
+</head>
+<body>
+<section class="start" id="start">
+  <div class="start-inner">
+    <div class="kicker">Matemática • 8º ano</div>
+    <h1>QUADRADOS</h1>
+    <div class="subtitle">Uma apresentação sobre as propriedades, medidas e elementos do quadrado.</div>
+    <div class="names"><span>Caio Bruch</span><span>Caio Lemos</span><span>Gabriel</span><span>Lara</span></div>
+    <button class="enter" onclick="openPresentation()">APRESENTAÇÃO</button>
+  </div>
+  <button class="corner" onclick="openPresentation()">APRESENTAÇÃO ↗</button>
+</section>
+
+<main class="presentation" id="presentation">
+<button class="home" onclick="goHome()">SAIR DA APRESENTAÇÃO</button>
+
+<section class="slide active" data-title="Capa">
+  <div style="height:100%;display:grid;grid-template-columns:1fr .75fr;align-items:center;gap:5vw">
+    <div>
+      <div class="kicker">Matemática • 8º ano</div>
+      <h2 style="font-size:clamp(70px,11vw,145px);font-weight:900;letter-spacing:-.07em">QUADRADOS</h2>
+      <p class="lead">Uma apresentação sobre as propriedades, medidas e elementos do quadrado.</p>
+      <div class="names" style="margin-top:35px"><span>Caio Bruch</span><span>Caio Lemos</span><span>Gabriel</span><span>Lara</span></div>
+    </div>
+    <div style="display:grid;place-items:center">
+      <svg viewBox="0 0 420 420" width="min(35vw,420px)" aria-label="quadrado">
+        <rect x="65" y="65" width="290" height="290" fill="none" stroke="#1769AA" stroke-width="7"/>
+        <line x1="65" y1="65" x2="355" y2="355" stroke="#123B59" stroke-width="3"/>
+        <line x1="355" y1="65" x2="65" y2="355" stroke="#123B59" stroke-width="3"/>
+        <circle cx="65" cy="65" r="6" fill="#1769AA"/><circle cx="355" cy="65" r="6" fill="#1769AA"/>
+        <circle cx="355" cy="355" r="6" fill="#1769AA"/><circle cx="65" cy="355" r="6" fill="#1769AA"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="slide definition">
+ <div class="slide-head"><h2>O que é um quadrado?</h2><div class="num">02 / 10</div></div>
+ <div class="grid2">
+  <div class="diagram-box">
+   <svg viewBox="0 0 520 420" width="520">
+    <rect x="105" y="55" width="310" height="310" class="bluefill" stroke="#1769AA" stroke-width="5"/>
+    <text x="91" y="48" class="label">A</text><text x="420" y="48" class="label">B</text>
+    <text x="420" y="390" class="label">C</text><text x="91" y="390" class="label">D</text>
+    <text x="250" y="42" text-anchor="middle" class="label">mesma medida</text>
+    <text x="250" y="405" text-anchor="middle" class="label">mesma medida</text>
+    <path d="M105 80 L130 80 L130 55" fill="none" stroke="#1769AA" stroke-width="3"/>
+    <text x="135" y="92" class="label" style="font-size:14px">90°</text>
+   </svg>
+  </div>
+  <div class="explain">
+   <p><strong>Quadrado</strong> é um quadrilátero que possui <span class="key">quatro lados de mesma medida</span> e <span class="key">quatro ângulos retos</span>.</p>
+   <ul class="points"><li>4 lados iguais</li><li>4 ângulos de 90°</li></ul>
+   <p>Os pontos A, B, C e D são os <strong>vértices</strong> do quadrado.</p>
+  </div>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="slide-head"><h2>Ângulos</h2><div class="num">03 / 10</div></div>
+ <div class="angle-layout">
+  <div style="display:grid;place-items:center">
+   <svg viewBox="0 0 600 440" width="620">
+    <rect x="125" y="55" width="330" height="330" fill="#e6f0f5" stroke="#1769AA" stroke-width="6"/>
+    <path d="M125 115 L185 115 L185 55" fill="none" stroke="#8f3437" stroke-width="5"/>
+    <text x="196" y="111" font-size="30" font-weight="800" fill="#8f3437">90°</text>
+    <text x="290" y="420" text-anchor="middle" font-size="20" font-weight="700" fill="#071827">ângulo reto</text>
+   </svg>
+  </div>
+  <div class="angle-note">
+   <strong>90°</strong>
+   <p class="explain">Cada canto do quadrado forma um <b>ângulo reto</b>.</p>
+   <p class="explain">Como são quatro ângulos de 90°, a soma dos ângulos internos é:</p>
+   <div class="math">90° + 90° + 90° + 90° = 360°</div>
+  </div>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="slide-head"><h2>Quadrado inscrito em um círculo</h2><div class="num">04 / 10</div></div>
+ <div class="circle-layout">
+  <div style="display:grid;place-items:center">
+   <svg viewBox="0 0 560 500" width="590">
+    <circle cx="280" cy="250" r="190" fill="#edf3f5" stroke="#1769AA" stroke-width="4"/>
+    <rect x="145" y="115" width="270" height="270" fill="none" stroke="#071827" stroke-width="5"/>
+    <line x1="145" y1="115" x2="415" y2="385" stroke="#8f3437" stroke-width="4"/>
+    <line x1="415" y1="115" x2="145" y2="385" stroke="#8f3437" stroke-width="4"/>
+    <circle cx="280" cy="250" r="6" fill="#8f3437"/>
+    <text x="292" y="244" class="label">centro</text>
+    <text x="425" y="258" class="label">diâmetro</text>
+    <text x="132" y="107" class="label">A</text><text x="420" y="107" class="label">B</text>
+    <text x="420" y="405" class="label">C</text><text x="132" y="405" class="label">D</text>
+   </svg>
+  </div>
+  <div class="circle-copy">
+   <p>Quando os <b>quatro vértices</b> do quadrado estão sobre a circunferência, dizemos que o quadrado está <b>inscrito</b> no círculo.</p>
+   <div class="callout">A diagonal passa pelo centro do círculo e corresponde ao <b>diâmetro</b>.</div>
+   <p>Por isso, nesse caso, a diagonal do quadrado tem a mesma medida que o diâmetro.</p>
+  </div>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="slide-head"><h2>Diagonais</h2><div class="num">05 / 10</div></div>
+ <div class="diag-layout">
+  <div style="display:grid;place-items:center">
+   <svg viewBox="0 0 560 500" width="610">
+    <rect x="110" y="55" width="340" height="340" fill="#e6f0f5" stroke="#1769AA" stroke-width="5"/>
+    <line x1="110" y1="55" x2="450" y2="395" stroke="#8f3437" stroke-width="5"/>
+    <line x1="450" y1="55" x2="110" y2="395" stroke="#8f3437" stroke-width="5"/>
+    <circle cx="280" cy="225" r="7" fill="#8f3437"/>
+    <text x="95" y="48" class="label">A</text><text x="455" y="48" class="label">B</text>
+    <text x="455" y="420" class="label">C</text><text x="95" y="420" class="label">D</text>
+    <text x="286" y="216" class="label" style="font-size:15px">centro</text>
+   </svg>
+  </div>
+  <div class="diag-list">
+   <p><b>Diagonal</b> é o segmento que liga dois vértices que não são vizinhos.</p>
+   <p>↗ <b>A → C</b></p><p>↘ <b>B → D</b></p>
+   <p>O quadrado possui <b>2 diagonais</b>.</p>
+   <p>Elas têm a <b>mesma medida</b> e se cruzam no centro.</p>
+  </div>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="slide-head"><h2>Área do quadrado</h2><div class="num">06 / 10</div></div>
+ <div class="area-layout">
+  <div>
+   <p class="lead">A <b>área</b> representa o espaço ocupado pela superfície do quadrado.</p>
+   <svg viewBox="0 0 430 430" width="430" style="max-width:80%">
+    <rect x="35" y="35" width="360" height="360" class="square-grid"/>
+    <rect x="35" y="35" width="360" height="360" class="square-border"/>
+    <g class="square-grid">
+     <line x1="107" y1="35" x2="107" y2="395"/><line x1="179" y1="35" x2="179" y2="395"/>
+     <line x1="251" y1="35" x2="251" y2="395"/><line x1="323" y1="35" x2="323" y2="395"/>
+     <line x1="35" y1="107" x2="395" y2="107"/><line x1="35" y1="179" x2="395" y2="179"/>
+     <line x1="35" y1="251" x2="395" y2="251"/><line x1="35" y1="323" x2="395" y2="323"/>
+    </g>
+    <text x="215" y="420" text-anchor="middle" class="label">5 unidades de lado</text>
+   </svg>
+  </div>
+  <div>
+   <div class="math">A = lado × lado</div><div class="math">A = l²</div>
+   <div class="area-example"><p class="lead"><b>Exemplo:</b> lado = 5 cm</p><div class="math">A = 5 × 5 = 25 cm²</div></div>
+  </div>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="slide-head"><h2>Mas o que significa √2?</h2><div class="num">07 / 10</div></div>
+ <div class="root-layout">
+  <div>
+   <p class="lead">Raiz quadrada é descobrir qual número, multiplicado por ele mesmo, resulta no número dentro da raiz.</p>
+   <div class="root-examples">
+    <div class="root-example"><b>√4 = 2</b>2 × 2 = 4</div>
+    <div class="root-example"><b>√9 = 3</b>3 × 3 = 9</div>
+    <div class="root-example"><b>√16 = 4</b>4 × 4 = 16</div>
+   </div>
+   <p class="between">E √2?</p>
+   <p class="lead">1 × 1 = 1<br>2 × 2 = 4</p>
+  </div>
+  <div style="border-left:4px solid var(--blue2);padding-left:32px">
+   <div class="root2">1 &lt; √2 &lt; 2</div>
+   <p class="lead">Não existe um número inteiro que, multiplicado por ele mesmo, dê exatamente 2.</p>
+   <p class="math">√2 ≈ 1,414</p>
+   <p class="lead">E, de fato:</p><p class="math" style="font-size:clamp(22px,2.3vw,34px)">1,414 × 1,414 ≈ 2</p>
+   <p class="lead"><b>√2</b> é um número que, multiplicado por ele mesmo, resulta em 2.</p>
+  </div>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="slide-head"><h2>Por que aparece √2 na diagonal?</h2><div class="num">08 / 10</div></div>
+ <div class="pyth-layout">
+  <div style="display:grid;place-items:center">
+   <svg viewBox="0 0 500 450" width="520">
+    <polygon points="90,365 90,95 360,365" fill="#e6f0f5" stroke="#1769AA" stroke-width="5"/>
+    <line x1="90" y1="95" x2="360" y2="365" stroke="#8f3437" stroke-width="5"/>
+    <path d="M90 335 L120 335 L120 365" fill="none" stroke="#071827" stroke-width="3"/>
+    <text x="75" y="230" class="label" transform="rotate(-90 75 230)">lado = 1</text>
+    <text x="220" y="392" class="label">lado = 1</text>
+    <text x="225" y="210" class="label" fill="#8f3437" transform="rotate(45 225 210)">diagonal = d</text>
+   </svg>
+  </div>
+  <div>
+   <p class="lead">A diagonal divide o quadrado em <b>dois triângulos retângulos</b>. Em um deles, usamos o Teorema de Pitágoras.</p>
+   <div class="step"><b>1.</b> d² = l² + l²</div>
+   <div class="step"><b>2.</b> Para lado 1: d² = 1² + 1²</div>
+   <div class="step"><b>3.</b> d² = 1 + 1 = 2</div>
+   <div class="step"><b>4.</b> d = √2 ≈ 1,414</div>
+   <hr style="border:0;border-top:1px solid #aebbc1;margin:22px 0">
+   <div class="formula">d = l√2</div>
+   <p class="lead">Se o lado mede 5 cm:</p>
+   <div class="formula" style="font-size:clamp(22px,2.3vw,34px)">d = 5√2 ≈ 7,07 cm</div>
+  </div>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="slide-head"><h2>Vértices</h2><div class="num">09 / 10</div></div>
+ <div class="vertices-layout">
+  <div style="display:grid;place-items:center">
+   <svg viewBox="0 0 560 480" width="600">
+    <rect x="120" y="70" width="320" height="320" fill="#e6f0f5" stroke="#1769AA" stroke-width="6"/>
+    <circle cx="120" cy="70" r="9" fill="#8f3437"/><circle cx="440" cy="70" r="9" fill="#8f3437"/>
+    <circle cx="440" cy="390" r="9" fill="#8f3437"/><circle cx="120" cy="390" r="9" fill="#8f3437"/>
+    <text x="97" y="62" class="label" font-size="24">A</text><text x="450" y="62" class="label" font-size="24">B</text>
+    <text x="450" y="415" class="label" font-size="24">C</text><text x="97" y="415" class="label" font-size="24">D</text>
+   </svg>
+  </div>
+  <div>
+   <p class="lead"><b>Vértice</b> é o ponto onde dois lados se encontram.</p>
+   <div class="recap">
+    <b>Recapitulando</b><br>
+    4 lados iguais<br>
+    4 ângulos de 90°<br>
+    2 diagonais<br>
+    A = l²<br>
+    d = l√2
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="slide end">
+ <div>
+  <div class="square-end"></div>
+  <h2>QUADRADOS</h2>
+  <div class="names"><span>Caio Bruch</span><span>Caio Lemos</span><span>Gabriel</span><span>Lara</span></div>
+ </div>
+ <div class="controls" style="background:var(--ink)"><div class="progress"><i></i></div><div class="counter">10 / 10</div></div>
+</section>
+
+<div class="controls">
+ <div class="progress"><i id="bar"></i></div>
+ <div class="counter" id="counter">01 / 10</div>
+</div>
+</main>
+
+<script>
+let current=0;
+const slides=[...document.querySelectorAll('.slide')];
+const pres=document.getElementById('presentation');
+const start=document.getElementById('start');
+const bar=document.getElementById('bar');
+const counter=document.getElementById('counter');
+
+function update(){
+ slides.forEach((s,i)=>s.classList.toggle('active',i===current));
+ const pct=((current+1)/slides.length)*100;
+ bar.style.width=pct+'%';
+ counter.textContent=String(current+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');
+ document.title='Quadrados — '+(current+1)+' / '+slides.length;
+}
+function openPresentation(){
+ start.style.display='none'; pres.style.display='block'; current=0; update();
+ if(document.documentElement.requestFullscreen){
+   document.documentElement.requestFullscreen().catch(()=>{});
+ }
+}
+function goHome(){
+ if(document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+ pres.style.display='none'; start.style.display='grid';
+}
+function next(){if(current<slides.length-1){current++;update()}}
+function prev(){if(current>0){current--;update()}}
+document.addEventListener('keydown',e=>{
+ if(pres.style.display!=='block') return;
+ if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();next()}
+ else if(e.key==='ArrowLeft'){e.preventDefault();prev()}
+ else if(e.key==='Escape'){goHome()}
+});
+document.addEventListener('click',e=>{
+ if(pres.style.display!=='block') return;
+ if(e.target.closest('button')) return;
+ if(e.clientX>innerWidth*.55) next();
+ else if(e.clientX<innerWidth*.25) prev();
+});
+update();
+</script>
+</body>
+</html>
